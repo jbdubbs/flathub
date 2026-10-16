@@ -1,0 +1,44 @@
+app-id: io.github.jbdubbs.qsstv-experimental
+runtime: org.kde.Platform
+runtime-version: '6.11'
+sdk: org.kde.Sdk
+command: qsstv-experimental
+
+finish-args:
+  - --share=ipc
+  - --socket=wayland
+  - --socket=fallback-x11
+  - --socket=pulseaudio
+  - --share=network
+  - --device=all
+
+cleanup:
+  - /include
+  - /lib/pkgconfig
+  - /lib/*.a
+  - /lib/*.la
+  - /share/man
+
+modules:
+  - name: hamlib
+    config-opts:
+      - --disable-static
+      - --enable-shared
+    sources:
+      - type: archive
+        url: https://github.com/Hamlib/Hamlib/releases/download/4.7.2/hamlib-4.7.2.tar.gz
+        sha256: ae1fcf2dbc80ea0786ea8f047b09399c3f7737d1930442f61a031708ed33e88f
+
+  - shared-modules/linux-audio/fftw3f.json
+
+  - name: qsstv-experimental
+    buildsystem: cmake-ninja
+    subdir: src
+    config-opts:
+      - -DCMAKE_BUILD_TYPE=Release
+      - -DQSSTV_APPID_NAMES=ON
+    sources:
+      - type: git
+        url: https://github.com/jbdubbs/QSSTV-Experimental.git
+        tag: "10.0"
+        commit: a84584248d3307bfa081362031ff20f365337633
